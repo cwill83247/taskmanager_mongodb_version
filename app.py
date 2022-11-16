@@ -12,7 +12,7 @@ def hello():                            #function
     return "Hello World ... again!"
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":                              #std using this to test we can access env.py and values
     app.run(host=os.environ.get("IP"),
-            port=int(os.environ.get("PORT")),
-            debug=True)
+            port=int(os.environ.get("PORT")),          #std note converting Port to INT
+            debug=True)                                 # !!In Live change to False
