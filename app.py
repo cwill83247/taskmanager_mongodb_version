@@ -6,6 +6,7 @@ from flask import (                         #std
 
 from flask_pymongo import PyMongo               #std
 from bson.objectid import ObjectId              #std 
+from werkzeug.security import generate_password_hash, check_password_hash
 if os.path.exists("env.py"):                #std
     import env
 
@@ -23,6 +24,12 @@ mongo = PyMongo(app)      #std creating instalnce of PyMongo using the app defin
 def get_tasks():                            #function
     tasks = mongo.db.tasks.find()               # dont fully understand this syntax
     return render_template("tasks.html", tasks=tasks)   #dont fully understand this syntax 
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    return render_template("register.html")
+
 
 if __name__ == "__main__":                              #std using this to test we can access env.py and values
     app.run(host=os.environ.get("IP"),
