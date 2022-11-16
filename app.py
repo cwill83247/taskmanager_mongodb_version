@@ -49,6 +49,31 @@ def register():
     return render_template("register.html")
 
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        # check if username exists in db
+        existing_user = mongo.db.users.find_one(                        #looking in the users table
+            {"username": request.form.get("username").lower()})         # the value in table or field is username and its compairing value in form field using form name attribute
+
+        if existing_user:                                          #if we have a users that matches go and check password otherwsie see bottom else staement 
+            # ensure hashed password matches user input
+            if check_password_hash(                                             #check_password_hash is a Werkzeug helper function that we can use as imported it 
+                existing_user["password"], request.form.get("password")):   #if password matches login
+                    session["user"] = request.form.get("username").lower()
+                    flash("Welcome, {}".format(request.form.get("username")))
+            else:
+                # invalid password match
+                flash("Incorrect Username and/or Password")
+                return redirect(url_for("login"))
+
+        else:
+            # username doesn't exist
+            flash("Incorrect Username and/or Password")
+            return redirect(url_for("login"))
+
+    return render_template("login.html")
+
 if __name__ == "__main__":                              #std using this to test we can access env.py and values
     app.run(host=os.environ.get("IP"),
             port=int(os.environ.get("PORT")),          #std note converting Port to INT
