@@ -82,7 +82,19 @@ def profile(username):
     # grab the session user's username from db
     username = mongo.db.users.find_one(
         {"username": session["user"]})["username"]
-    return render_template("profile.html", username=username)    #first username is the one in profile.html the placeholder  the 2nd username is the variable we are creating in this fuction
+    
+    if session["user"]:                                                 # adding a session variable check to stop a user being able to impersonate someone 
+        return render_template("profile.html", username=username)       # if above is true then return prpfile otherwise return login
+        
+    return redirect(url_for("login")) 
+
+
+@app.route("/logout")
+def logout():
+    # remove user from session cookie
+    flash("You have been logged out")
+    session.pop("user")
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":                              #std using this to test we can access env.py and values
