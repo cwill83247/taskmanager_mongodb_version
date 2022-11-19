@@ -22,7 +22,7 @@ mongo = PyMongo(app)      #std creating instalnce of PyMongo using the app defin
 @app.route("/")                         # std our inital home route ---- 
 @app.route("/get_tasks")
 def get_tasks():                            #function
-    tasks = mongo.db.tasks.find()               # dont fully understand this syntax
+    tasks = list(mongo.db.tasks.find())            # dont fully understand this syntax
     return render_template("tasks.html", tasks=tasks)   #dont fully understand this syntax 
 
 
@@ -96,6 +96,11 @@ def logout():
     session.pop("user")                             #could also use session.clear 
     return redirect(url_for("login"))
 
+
+@app.route("/add_task")
+def add_task():
+    return render_template("add_task.html")
+    
 
 if __name__ == "__main__":                              #std using this to test we can access env.py and values
     app.run(host=os.environ.get("IP"),
