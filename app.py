@@ -97,8 +97,22 @@ def logout():
     return redirect(url_for("login"))
 
 
-@app.route("/add_task")
+@app.route("/add_task", methods=["GET", "POST"])        # DOnt forget to Add the Methods !!!!
 def add_task():
+    if request.method == "POST":                                     #checking if POST method
+        is_urgent = "on" if request.form.get("is_urgent") else "off"  #creating a variable to hold the is urgent on or off
+        task = {                                                       #creating a dictonairy with variable name "task" to hold the values in value pairs from the form         
+            "category_name": request.form.get("category_name"),
+            "task_name": request.form.get("task_name"),
+            "task_description": request.form.get("task_description"),
+            "is_urgent": is_urgent,
+            "due_date": request.form.get("due_date"),
+            "created_by": session["user"]                       # adding users session so that we have a record of who created it --- 
+        }
+        mongo.db.tasks.insert_one(task)                             # inserting task variable into the DB
+        flash("Task Successfully Added")                            # message to user
+        return redirect(url_for("get_tasks"))                       # then going back  to the get_tasks function but is actually tasks.html 
+
     categories = mongo.db.categories.find().sort("category_name", 1)
     return render_template("add_task.html", categories=categories)
 
