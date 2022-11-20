@@ -116,8 +116,24 @@ def add_task():
     categories = mongo.db.categories.find().sort("category_name", 1)
     return render_template("add_task.html", categories=categories)
 
+@app.route("/edit_task/<task_id>", methods=["GET", "POST"])            # need to pass in the_id from the mongoDb to ensure editing correct entry 
+def edit_task(task_id):
+    if request.method == "POST":                                      #Post method required for the Edit Form 
+        is_urgent = "on" if request.form.get("is_urgent") else "off"
+            submit = {
+                "category_name": request.form.get("category_name"),
+                "task_name": request.form.get("task_name"),
+                "task_description": request.form.get("task_description"),
+                "is_urgent": is_urgent,
+                "due_date": request.form.get("due_date"),
+                "created_by": session["user"]
+        }  
+    task = mongo.db.tasks.find_one({"_id": ObjectId(task_id)})
+    categories = mongo.db.categories.find().sort("category_name", 1)
+    return render_template("edit_task.html", task=task, categories=categories)             #passign through the taks vairable above hwich is define the exact task by its ID
+
 
 if __name__ == "__main__":                              #std using this to test we can access env.py and values
     app.run(host=os.environ.get("IP"),
-            port=int(os.environ.get("PORT")),          #std note converting Port to INT
+            port=int(os.environ.get("PORT")),          #std note converting Port to an INT
             debug=True)                                 # !!In Live change to False
