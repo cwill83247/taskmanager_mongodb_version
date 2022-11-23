@@ -46,8 +46,9 @@ def register():
         # put the new user into 'session' cookie
         session["user"] = request.form.get("username").lower()              #session created 
         flash("Registration Successful!")
-    return redirect(url_for("profile", username=session["user"]))               #setting username to session cookig of user !! bit unsure here 
-
+        return redirect(url_for("profile", username=session["user"]))               #setting username to session cookig of user !! bit unsure here 
+    
+    return render_template("register.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
