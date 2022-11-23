@@ -19,11 +19,19 @@ app.secret_key = os.environ.get("SECRET_KEY")
 
 mongo = PyMongo(app)      #std creating instalnce of PyMongo using the app defined above
 
+
 @app.route("/")                         # std our inital home route ---- 
 @app.route("/get_tasks")
 def get_tasks():                            #function
     tasks = list(mongo.db.tasks.find())            # dont fully understand this syntax
     return render_template("tasks.html", tasks=tasks)   #dont fully understand this syntax 
+
+
+@app.route("/search", methods=["GET", "POST"])     #Search route decorator 
+def search():                                      #Search function     
+    query = request.form.get("query")             #query variable
+    tasks = list(mongo.db.tasks.find({"$text": {"$search": query}}))     #tasks variable   tasks.find function is expceting 2 dictonairies pass in query variable above 
+    return render_template("tasks.html", tasks=tasks)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -176,6 +184,12 @@ def edit_category(category_id):
     category = mongo.db.categories.find_one({"_id": ObjectId(category_id)})
     return render_template("edit_category.html", category=category)
 
+
+@app.route("/delete_category/<category_id>")
+def delete_category(category_id):
+    mongo.db.categories.delete_one({"_id": ObjectId(category_id)})
+    flash("Category Successfully Deleted")
+    return redirect(url_for("get_categories"))
 
 
 if __name__ == "__main__":                              #std using this to test we can access env.py and values
