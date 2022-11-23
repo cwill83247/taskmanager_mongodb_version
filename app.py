@@ -138,6 +138,32 @@ def edit_task(task_id):
     return render_template("edit_task.html", task=task, categories=categories)
 
 
+@app.route("/delete_task/<task_id>")
+def delete_task(task_id):
+    mongo.db.tasks.delete_one({"_id": ObjectId(task_id)})
+    flash("Task Successfully Deleted")
+    return redirect(url_for("get_tasks"))
+
+@app.route("/get_categories")
+def get_categories():
+    categories = list(mongo.db.categories.find().sort("category_name", 1)) # we are also sorting the list alphbetically
+    return render_template("categories.html", categories=categories)  #categories=categories  1st category is what actually gets passed to categories.html the 2nd is the varibale we create above
+
+
+@app.route("/add_category", methods=["GET", "POST"])
+def add_category():
+    if request.method == "POST":
+        category = {
+            "category_name": request.form.get("category_name")
+        }
+        mongo.db.categories.insert_one(category)
+        flash("New Category Added")
+        return redirect(url_for("get_categories"))
+
+    return render_template("add_category.html")
+
+
+
 if __name__ == "__main__":                              #std using this to test we can access env.py and values
     app.run(host=os.environ.get("IP"),
             port=int(os.environ.get("PORT")),          #std note converting Port to an INT
